@@ -62,7 +62,6 @@ def spmatmul(D, x, transpose_A=False, transpose_B=False):
         # TODO: check validity
         # take the list of tensors
         x = x.tensors
-        #print([t.shape for t in x])
     if isinstance(x, list):
         pass
     else:

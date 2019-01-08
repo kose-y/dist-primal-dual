@@ -88,19 +88,16 @@ class DistMat:
             
         if sess is None:
             sess = tf.Session()
-        #self.sess=sess
         if axis != 0:
             raise NotImplementedError
         shape = dat.shape
         d     = len(devices)
         n     = shape[axis]
         partition = partitioner(n,d)
-        #placeholders = []
         variables    = []
         ph_dict = {}
 
         for i, d in enumerate(devices):
-            #print(i)
             with tf.device(d):
                 part_rows = partition[i+1]-partition[i]
                 if part_rows in ph_dict.keys():
@@ -108,26 +105,16 @@ class DistMat:
                 else:
                     ph = tf.placeholder(dtype, shape=(partition[i+1]-partition[i],shape[1] ))
                     ph_dict[part_rows] = ph
-                    
-
-                #ph = tf.placeholder(dtype, shape=(partition[i+1]-partition[i],shape[1] ))
                 v  = tf.Variable(ph)
 
-                #placeholders.append(ph)
             feed_dict = dict()
             feed_dict[ph] = dat[partition[i]:partition[i+1], :]
 
             sess.run(v.initializer, feed_dict=feed_dict)
             variables.append(v)
 
-        #initializers = [v.initializer for v in variables]
 
 
-        #feed_dict = dict()
-        #for i, ph in enumerate(placeholders):
-            #feed_dict[ph] = dat[partition[i]:partition[i+1], :]
-
-        #sess.run(initializers, feed_dict=feed_dict)
         return DistMat(variables, sess)
     def eval(self,session):
         return [t.eval(session=session) for t in self.tensors]
@@ -195,17 +182,6 @@ class DistSpMat:
 
         partition_r = partitioner_r(n_r, nd_r)
         partition_c = partitioner_c(n_c, nd_c)
-        #q_r     = n_r//nd_r
-        #q_c     = n_c//nd_c
-        #r_r     = n_r%nd_r
-        #r_c     = n_c%nd_c
-        #n_ris   = [q_r + (1 if i<r_r else 0) for i in range(nd_r)]
-        #n_cis   = [q_c + (1 if i<r_c else 0) for i in range(nd_c)]
-        #partition_r = np.cumsum([0]+n_ris)
-        #partition_c = np.cumsum([0]+n_cis)
-        #if grppart: 
-        #    for i in range(len(partition_r)):
-        #        partition_r[i] = utils.find_nearest(grppart, partition_r[i])
         variables_r    = []
         variables_c    = []
         D_nz_r = csr_nonzero_rows(D_csr)
@@ -252,18 +228,3 @@ class DistSpMat:
             return DistSpMat(D_tensors, Dt_tensors, D_nz_r, D_nz_c, partition_r, partition_c, devices_r, devices_c)
 
 
-
-
-                
-
-        '''
-
-        for i,d in enumerate(devices_r):
-            target = D_csr[partition_r[i]:partition_r[i+1], :]
-            target_nzrows = csr_nonzero_rows(target)
-            target_nzrowmat = target[target_nz,:]
-
-            with tf.device(d):
-                pass
-        '''
-                

@@ -90,6 +90,7 @@ class BddParamSet(ParamSet):
         P, Q, L_F, dnorm = self.P, self.Q, self.L_F, self.dnorm
         omega_x, omega_y = self.omega_x, self.omega_y
         return omega_y/(dnorm*omega_x)    
+
 class BddStocParamSet(ParamSet):
     def __init__(self, N, a,b,c,d, L_F, dnorm, Omega_X, Omega_Y, sigma_x, sigma_y):
         self.N, self.Omega_X, self.Omega_Y, self.sigma_x, self.sigma_y = N, Omega_X, Omega_Y, sigma_x, sigma_y

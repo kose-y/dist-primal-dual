@@ -32,6 +32,7 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
+tf.set_random_seed(1234)
 dat = scipy.io.loadmat('../data/Zhu_1000_10_5000_20_0.7_100.mat' )
 Xdat = scipy.io.loadmat('../data/Zhu_1000_10_5000_20_0.7_100_X.mat' )
 print ("loading data...")

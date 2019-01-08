@@ -33,6 +33,7 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
+tf.set_random_seed(1234)
 dat = scipy.io.loadmat('../data/ogrp_100_100_10_5000.mat')
 Xdat = h5py.File('../data/ogrp_100_100_10_5000_X.mat')
 print ("loading data...")
@@ -55,7 +56,6 @@ ab_list = [(-1, 0), (0, 0), (-0.5, 0.5), (-1, 1)]
 expr_names = ['ogl_bdd_chen_stoc', 'ogl_bdd_lv_stoc', 'ogl_bdd_half_stoc', 'ogl_bdd_cv_stoc']
 expr_names += ['ogl_unbdd_chen_stoc', 'ogl_unbdd_lv_stoc', 'ogl_unbdd_half_stoc', 'ogl_unbdd_cv_stoc']
 params_list = []
-p = 0.95
 Omega_X = 12
 Omega_Y = 15
 dinfnorm = 2
