@@ -7,7 +7,7 @@ This repository contains the Python package `dist_pd` for distributed computatio
 
 ### On Linux
 
-Prerequisites: Python 3, with tensorflow >=1.2 installed. The code is tested on Python 3.6.  **Tensorflow is not automatically installed by our setup script**. To install tensorflow on your system, you can follow the instructions in [this link](https://www.tensorflow.org/install/). 
+Prerequisites: Python 3, with tensorflow >=1.2 installed. The code is tested on Python 3.5.  **Tensorflow is not automatically installed by our setup script**. To install tensorflow on your system, you can follow the instructions in [this link](https://www.tensorflow.org/install/). 
 If you wish to run the code on Nvidia GPU(s), please read instructions on additional setup [here](https://www.tensorflow.org/install/gpu).
 
 One may run the following to install the code:
