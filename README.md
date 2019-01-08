@@ -51,4 +51,4 @@ You may choose to download a bigger dataset from Docker Hub.
 
 If you use our package in your research, please cite the following item:
 
-_Ko S, Yu D, Won J (2019). Easily parallelizable and distributable class of algorithms for structured sparsity, with optimal acceleration. Accepted for Journal of Computational and Graphical Statistics. [link to preprint](https://arxiv.org/abs/1702.06234)_
+_Ko S, Yu D, Won J (2019). Easily parallelizable and distributable class of algorithms for structured sparsity, with optimal acceleration. Accepted with minor revision for Journal of Computational and Graphical Statistics. [link to preprint](https://arxiv.org/abs/1702.06234)_
