@@ -1,0 +1,56 @@
+#################################################################################################################
+# Reference
+#     https://github.com/NVIDIA/nvidia-docker
+#################################################################################################################
+FROM nvidia/cuda:9.0-cudnn7-devel
+
+#################################################################################################################
+#           ENV Setting
+#################################################################################################################
+ENV CONDA_DIR /opt/conda
+ENV PATH $CONDA_DIR/bin:$PATH
+ENV LANG C.UTF-8
+
+#################################################################################################################
+#           Initial Setting
+#################################################################################################################
+RUN mkdir -p $CONDA_DIR && \
+    echo export PATH=$CONDA_DIR/bin:'$PATH' > /etc/profile.d/conda.sh && \
+    apt-get update && \
+    apt-get install -y wget git libhdf5-dev g++ graphviz && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh && \
+    /bin/bash /Miniconda3-4.5.11-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-4.5.11-Linux-x86_64.sh && \
+    ${CONDA_DIR}/bin/conda clean -tipsy  
+
+#################################################################################################################
+#           User Setting
+#################################################################################################################
+ENV USER user
+ENV UID 1000
+#
+RUN useradd -m -s /bin/bash -N -u $UID $USER && \
+    mkdir -p $CONDA_DIR && \
+    chown $USER $CONDA_DIR -R && \
+    mkdir -p /src && \
+    chown $USER /src
+
+USER user
+
+#################################################################################################################
+#           Python Setting
+#################################################################################################################
+# Python
+ARG python_version=3.5
+RUN conda install -y python=${python_version} && \
+    pip install h5py scipy numpy tensorflow-gpu && \
+    conda clean -yt
+
+ENV PYTHONPATH='/src/:$PYTHONPATH'
+
+WORKDIR /distpd_package
+
+#EXPOSE 8888
+
+#CMD jupyter notebook --port=8888 --ip=0.0.0.0
+
