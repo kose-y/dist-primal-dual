@@ -12,14 +12,12 @@ import h5py
 import sys
 import time
 
-from argparser import parser_singledevice
+from argparser import parser_distributed
 
-default_ngrps=1000
-parser = parser_singledevice("Overlapping group lasso, FB splitting-based iterations")
-args = parser.parse_args()
+args = parser_distributed("Overlapping group lasso, FB splitting-based iterations", 1, "../data/ogrp_100_100_10_5000", 164.9960**2, default_output_prefix="ogl_fb_")
 
-ngpu = 1
-nslices = 1
+ngpu = args.ngpus
+nslices = args.nslices
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(i) for i in range(ngpu)]) # select devices
 
@@ -33,8 +31,8 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
-dat = scipy.io.loadmat('../data/ogrp_100_100_10_5000.mat')
-Xdat = h5py.File('../data/ogrp_100_100_10_5000_X.mat')
+dat = scipy.io.loadmat('{}.mat'.format(args.data_prefix) )
+Xdat = h5py.File('{}_X.mat'.format(args.data_prefix ))
 print ("loading data...")
 At = np.asarray(Xdat['X'])
 print ("done loading data")
@@ -49,9 +47,11 @@ loss = dist_pd.losses.QuadLoss
 xnorm = 164.9960
 
 
-dnorm=1.4142; Lf = xnorm**2
+dnorm=1.4142
+Lf = args.L
 kappas = [-1, -0.1, -0.5, 0]
-expr_names = ['ogl_base_cv', 'ogl_base_01', 'ogl_base_05', 'ogl_base_lv']
+expr_names = ['cv', '01', '05', 'lv']
+expr_names = [args.output_prefix+x for x in expr_names]
 params = []
 tau = 2*0.9/Lf
 for kappa in kappas:
@@ -71,7 +71,7 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
     print("maxynorm: ", sess.run(penalty.maxynorm)) 
     for param, kappa, expr_name in zip(params, kappas, expr_names):
         tau, sigma, rho = param
-        prob = dist_pd.primal_dual.BaseKappa(loss, penalty, At, D_dist, b, aggregate=True, 
+        prob = dist_pd.primal_dual.BaseKappa(loss, penalty, At, D_dist, b, aggregate=not args.nonergodic, 
             tau=tau, sigma=sigma, rho=rho, dtype=tf.float32, devices=devices, kappa=kappa)
         rslt = prob.solve(check_interval=interval, max_iters=iters,outfile=expr_name,verbose=True)
 

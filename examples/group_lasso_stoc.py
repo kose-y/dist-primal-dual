@@ -13,13 +13,12 @@ import sys
 import time
 from dist_pd.optimal_paramset import BddStocParamSet, UnbddStocParamSet
 
-from argparser import parser_singledevice
+from argparser import parser_distributed
 
-parser = parser_singledevice("Overlapping group lasso, stochastic iteration.")
-args = parser.parse_args()
+args = parser_distributed("Overlapping group lasso, stochastic iteration.", 1, "../data/ogrp_100_100_10_5000", 164.9960**2, default_output_prefix="ogl_stoc_", stoc=True, default_s=300000)
 
-ngpu = 1
-nslices = 1
+ngpu = args.ngpus
+nslices = args.nslices
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(i) for i in range(ngpu)]) # select devices
 
@@ -34,8 +33,8 @@ interval = args.interval
 
 import tensorflow as tf
 tf.set_random_seed(1234)
-dat = scipy.io.loadmat('../data/ogrp_100_100_10_5000.mat')
-Xdat = h5py.File('../data/ogrp_100_100_10_5000_X.mat')
+dat = scipy.io.loadmat('{}.mat'.format(args.data_prefix) )
+Xdat = h5py.File('{}_X.mat'.format(args.data_prefix ))
 print ("loading data...")
 At = np.asarray(Xdat['X'])
 print ("done loading data")
@@ -47,23 +46,23 @@ D = dat['C'].tocoo().astype('float32')
 
 loss = dist_pd.losses.QuadLoss
 xnorm = 164.9960 # for 100 grps
-dnorm=1.4142; Lf = xnorm**2
+dnorm=1.4142; 
+Lf = args.L
 tau = 2*0.9/Lf
 sigma = 0.9/(tau*dnorm**2)
 lam = ng/100.0
 #penalty=dist_pd.penalties.GroupLasso(lam, g, dtype=tf.float32)
 ab_list = [(-1, 0), (0, 0), (-0.5, 0.5), (-1, 1)]
-expr_names = ['ogl_bdd_chen_stoc', 'ogl_bdd_lv_stoc', 'ogl_bdd_half_stoc', 'ogl_bdd_cv_stoc']
-expr_names += ['ogl_unbdd_chen_stoc', 'ogl_unbdd_lv_stoc', 'ogl_unbdd_half_stoc', 'ogl_unbdd_cv_stoc']
+expr_names = ['bdd_chen', 'bdd_lv', 'bdd_half', 'bdd_cv']
+expr_names += ['unbdd_chen', 'unbdd_lv', 'unbdd_half', 'unbdd_cv']
+expr_names = [args.output_prefix+x for x in expr_names]
 params_list = []
 Omega_X = 12
 Omega_Y = 15
 dinfnorm = 2
-s_b = 300000
-s = 300000
-print("s: ", s)
+s_b = args.s
 dtilde = 10
-s/= dtilde
+s = s_b/dtilde
 expr_names = [x+'_'+str(dtilde)  for x in expr_names]
 
 params_list.append(BddStocParamSet(iters, 1, 0, 0, 1, Lf, dnorm, Omega_X, Omega_Y, s_b, s_b)) # Chen
@@ -87,7 +86,7 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
         prob = dist_pd.primal_dual.OptimalABStochastic(loss, penalty, 0.2, 1.0, At, D_dist, b, 
             tau=params.tau, sigma=params.sigma, rho=params.rho, theta=params.theta, 
             coef_a=ab[0], coef_b=ab[1],
-            dtype=tf.float32, devices=devices, aggregate=True, sess=sess)
+            dtype=tf.float32, devices=devices, aggregate=not args.nonergodic, sess=sess)
         rslt = prob.solve(check_interval=interval, max_iters=iters, verbose=True, outfile=expr_name)
     
     

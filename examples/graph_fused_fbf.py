@@ -10,12 +10,11 @@ import scipy.io
 import h5py
 import sys
 import time
-from argparser import parser_singledevice
+from argparser import parser_distributed
 
-parser = parser_singledevice("Graph-guided fused lasso, FBF splitting.")
-args = parser.parse_args()
-ngpu = 1
-nslices = 1 #slices per gpu. the more the slice, the less memory usage.
+args = parser_distributed("Graph-guided fused lasso, FBF splitting.", 1, "../data/Zhu_1000_10_5000_20_0.7_100", 255.6824**2, default_output_prefix="ggfl_fbf_")
+ngpu = args.ngpus
+nslices = args.nslices #slices per gpu. the more the slice, the less memory usage.
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(i) for i in range(ngpu)]) # select devices
 
@@ -29,8 +28,8 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
-dat = scipy.io.loadmat('../data/Zhu_1000_10_5000_20_0.7_100.mat' )
-Xdat = scipy.io.loadmat('../data/Zhu_1000_10_5000_20_0.7_100_X.mat' )
+dat = scipy.io.loadmat('{}.mat'.format(args.data_prefix) )
+Xdat = scipy.io.loadmat('{}_X.mat'.format(args.data_prefix ))
 print ("loading data...")
 At = np.asarray(Xdat['X'])
 print ("done loading data")
@@ -40,12 +39,12 @@ D = dat['D'].tocoo().astype('float32')
 
 loss = dist_pd.losses.QuadLoss
 
-xnorm = 255.6824
-dnorm=4.5074; Lf = xnorm**2
+dnorm=4.5074; 
+Lf = args.L
 tau = 2*0.9/Lf
 
 kappas =[0]
-expr_names = ['ggfl_fbf_001_001']
+expr_names = ['{}001_001'.format(args.output_prefix)]
 
 
 lam = 1.0
@@ -62,7 +61,7 @@ D_dist = dist_pd.distmat.DistSpMat.from_spmatrix(D, devices )
 with tf.Session() as sess:
     for param, kappa, expr_name in zip(params, kappas, expr_names):
         alpha1, alpha2, tau = param
-        prob = dist_pd.primal_dual.FBFInertial(loss, penalty, At, D_dist, b, aggregate=False, 
+        prob = dist_pd.primal_dual.FBFInertial(loss, penalty, At, D_dist, b, aggregate=not args.nonergodic, 
             tau=tau, alpha1=alpha1, alpha2=alpha2, dtype=tf.float32, devices=devices)
         rslt = prob.solve(check_interval=interval, max_iters=iters,verbose=True, outfile=expr_name)
 

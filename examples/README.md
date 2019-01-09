@@ -27,14 +27,18 @@ Except for `*_distributed.py` files, where we used multiple settings, the defaul
 Optional arguments common for all files:
 
 - `-h`, `--help`: Prints help message.
+- `--data`: prefix for the data files, defaults to the data file in `../data`.
+- `--L`: estimate for the Lipschitz constant of the gradient of the smooth function f. in this case, the tight lower bound is spectral norm of the data squared. defaults to the value for our sample data. 
+- `--nslices`: Number of slices of data to be stored in each GPU. This was introduced due to specific internal design of tensorflow in order to decrease memory usage. The default value of 5 was used in our experiments.
+- `--ngpus`: Number of GPUs to be used.
 - `--iters`: Number of iterations. For optimal-rate iterations, this also defines the horizon, thus the set of parameters. 
 - `--interval`: The interval between computing objecive values. Note that computing objective values is usually one of the slowest operations in many optimization problems. 
 - `--cpu`: Perform the computation on CPU only. 
+- `--nonergodic`: we deal with the nonergodic sequences.
+- `--output-prefix`: the prefix for the output files. 
 
-The following arguments are available for distributed experiments:
-- `--ngroups`: Number of "groups" as defined in each experiment (graph-guided fused lasso or overlapping group lasso)
-- `--nslices`: Number of slices of data to be stored in each GPU. This was introduced due to specific internal design of tensorflow in order to decrease memory usage. The default value of 5 was used in our experiments.
-- `--ngpus`: Number of GPUs to be used.
+The following arguments are exclusive for stochastic experiments:
+- `--s`: value of "s" for stochastic iterations.
 
 
 

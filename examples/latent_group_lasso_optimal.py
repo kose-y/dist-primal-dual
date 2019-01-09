@@ -12,14 +12,12 @@ import h5py
 import sys
 import time
 from dist_pd.optimal_paramset import BddParamSet, UnbddParamSet
-from argparser import parser_singledevice
+from argparser import parser_distributed
 
-default_ngrps=1000
-parser = parser_singledevice("Latent group lasso, optimal-rate iteration.")
-args = parser.parse_args()
+args = parser_distributed("Latent group lasso, optimal-rate iteration.", 1, "../data/ogrp_100_100_10_5000", 164.9960**2, default_output_prefix="lgl_opt_")
 
-ngpu = 1
-nslices = 1
+ngpu = args.ngpus
+nslices = args.nslices
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(i) for i in range(ngpu)]) # select devices
 
@@ -33,8 +31,8 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
-dat = scipy.io.loadmat('../data/ogrp_100_100_10_5000.mat')
-Xdat = h5py.File('../data/ogrp_100_100_10_5000_X.mat')
+dat = scipy.io.loadmat('{}.mat'.format(args.data_prefix) )
+Xdat = h5py.File('{}_X.mat'.format(args.data_prefix ))
 print ("loading data...")
 At = np.asarray(Xdat['X'])
 print ("done loading data")
@@ -46,7 +44,8 @@ D = dat['C'].tocoo().astype('float32')
 
 lam = ng/100
 loss = dist_pd.losses.QuadLoss
-xnorm = 164.9960 # for 100 grps
+#xnorm = 164.9960 # for 100 grps
+dnorm=2; Lf = args.L
 
 Omega_X = 12
 Omega_Y = 15
@@ -60,9 +59,9 @@ penalty1 = dist_pd.penalties.GroupLasso(lam, g, devices = devices,
 penalty2 = dist_pd.penalties.Ind0()
 
 
-dnorm=2; Lf = xnorm**2
 ab_list = [(-1, 0), (0, 0), (-0.5, 0.5), (-1, 1), (-1, 0), (0, 0), (-0.5, 0.5), (-1, 1) ]
-expr_names = ['lgl_bdd_chen', 'lgl_bdd_lv', 'lgl_bdd_half', 'lgl_bdd_cv', 'lgl_unbdd_chen', 'lgl_unbdd_lv', 'lgl_unbdd_half', 'lgl_unbdd_cv']
+expr_names = ['bdd_chen', 'bdd_lv', 'bdd_half', 'bdd_cv', 'unbdd_chen', 'unbdd_lv', 'unbdd_half', 'unbdd_cv']
+expr_names = [args.output_prefix+x for x in expr_names]
 
 params_list = []
 params_list.append(BddParamSet(iters, 1, 0, 0, 1, Lf, dnorm, Omega_X, Omega_Y)) # Chen
@@ -77,7 +76,7 @@ params_list.append(UnbddParamSet(iters, 1, 1, 0, 2, Lf, dnorm))# CV
 
 with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
     for params, ab, expr_name in zip(params_list, ab_list, expr_names):
-        prob = dist_pd.split_22.OptimalAB(loss, penalty1, penalty2, At, D_dist, b, aggregate=True, 
+        prob = dist_pd.split_22.OptimalAB(loss, penalty1, penalty2, At, D_dist, b, aggregate=not args.nonergodic, 
             tau=params.tau, sigma=params.sigma, rho=params.rho, theta=params.theta, 
             coef_a = ab[0], coef_b = ab[1], 
             dtype=tf.float32, devices=devices, sess=sess)

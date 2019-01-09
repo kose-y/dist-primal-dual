@@ -11,14 +11,12 @@ import sys
 import time
 from argparser import parser_distributed
 
-default_ngrps=10000
-parser = parser_distributed("Graph-guided fused lasso, distributed mode.", 10000, 5, [10000, 50000])
-args = parser.parse_args()
+args = parser_distributed("Graph-guided fused lasso, distributed mode.", 5, "../data/Zhu_10000_12_5000_20_0.7_10000", 499.6337**2, 1100, 100, False)
 
 
 ngpu = args.ngpus
-ngrps = args.ngrps
 nslices = args.nslices 
+
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(i) for i in range(ngpu)]) # select devices
 
@@ -32,8 +30,8 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
-dat = scipy.io.loadmat('../data/Zhu_%d_12_5000_20_0.7_10000.mat' %(ngrps,))
-Xdat = h5py.File('../data/Zhu_%d_12_5000_20_0.7_10000_X.mat' % (ngrps,))
+dat = scipy.io.loadmat(args.data_prefix+'.mat')
+Xdat = h5py.File(args.data_prefix+'_X.mat')
 print ("loading data...")
 At = np.asarray(Xdat['X'])
 print ("done loading data")
@@ -43,13 +41,14 @@ D = dat['D'].tocoo().astype('float32')
 
 #single device version
 loss = dist_pd.losses.QuadLoss
-xnormdict = {}
-xnormdict[10000] = 499.6337
-xnormdict[50000] = 919.5103 # for 50000 grps
-xnormdict[80000] = 1124.4 # for 80000 grps
-xnormdict[100000] = 1238.6 # for 100000 grps
-xnorm = xnormdict[ngrps]
-dnorm=4.9045; Lf = xnorm**2
+#xnormdict = {}
+#xnormdict = 499.6337
+#xnormdict[50000] = 919.5103 # for 50000 grps
+#xnormdict[80000] = 1124.4 # for 80000 grps
+#xnormdict[100000] = 1238.6 # for 100000 grps
+#xnorm = xnormdict[ngrps]
+dnorm=4.9045#; Lf = xnorm**2
+Lf = args.L
 tau = 2*0.9/Lf
 sigma = 0.9/(tau*dnorm**2)
 lam = 1.0
@@ -59,6 +58,6 @@ penalty = dist_pd.penalties.L1Penalty(lam)
 D_dist = dist_pd.distmat.DistSpMat.from_spmatrix(D, devices )
 with tf.Session() as sess:
     prob = dist_pd.primal_dual.BaseLV(loss, penalty, At, D_dist, b, 
-            tau=tau, sigma=sigma, dtype=tf.float32, devices=devices)
+            tau=tau, sigma=sigma, dtype=tf.float32, devices=devices, aggregate=not args.nonergodic)
     rslt = prob.solve(check_interval=interval, max_iters=iters,verbose=True)
 

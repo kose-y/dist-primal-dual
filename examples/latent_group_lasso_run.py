@@ -11,14 +11,12 @@ import scipy.io
 import h5py
 import sys
 import time
-from argparser import parser_singledevice
+from argparser import parser_distributed
 
-default_ngrps=1000
-parser = parser_singledevice("Overlapping group lasso, distributed mode.")
-args = parser.parse_args()
+args = parser_distributed("Overlapping group lasso, distributed mode.", 1, "../data/ogrp_100_100_10_5000", 164.9960**2, default_output_prefix="lgl_fb_")
 
-ngpu = 1
-nslices = 1
+ngpu = args.ngpus
+nslices = args.nslices
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(i) for i in range(ngpu)]) # select devices
 
@@ -32,8 +30,8 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
-dat = scipy.io.loadmat('../data/ogrp_100_100_10_5000.mat')
-Xdat = h5py.File('../data/ogrp_100_100_10_5000_X.mat')
+dat = scipy.io.loadmat('{}.mat'.format(args.data_prefix) )
+Xdat = h5py.File('{}_X.mat'.format(args.data_prefix ))
 print ("loading data...")
 At = np.asarray(Xdat['X'])
 print ("done loading data")
@@ -48,7 +46,7 @@ loss = dist_pd.losses.QuadLoss
 xnorm = 164.9960 # for 100 grps
 
 
-dnorm=2; Lf = xnorm**2
+dnorm=2; Lf = args.L
 
 # setup experiments
 def get_params(kappa):
@@ -57,7 +55,8 @@ def get_params(kappa):
     rho = 0.9*(2-Lf/(2*mu))
     return sigma, rho
 kappas = [-1, -0.1, 0]
-expr_names = ['lgl_cv', 'lgl_01', 'lgl_lv']
+expr_names = ['cv', '01', 'lv']
+expr_names = [args.output_prefix+x for x in expr_names]
 params = []
 tau = 2*0.9/Lf
 for kappa in kappas:
@@ -74,7 +73,7 @@ penalty2 = dist_pd.penalties.Ind0()
 with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
     for param, kappa, expr_name in zip(params, kappas, expr_names):
         tau, sigma, rho = param
-        prob = dist_pd.split_22.BaseKappa(loss, penalty1, penalty2, At, D_dist, b, aggregate=True, 
+        prob = dist_pd.split_22.BaseKappa(loss, penalty1, penalty2, At, D_dist, b, aggregate=not args.nonergodic, 
             tau=tau, sigma=sigma, rho=rho, dtype=tf.float32, devices=devices, kappa=kappa)
         rslt = prob.solve(check_interval=interval, max_iters=iters,outfile=expr_name,verbose=True)
 

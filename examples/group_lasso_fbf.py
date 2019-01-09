@@ -13,14 +13,14 @@ import h5py
 import sys
 import time
 
-from argparser import parser_singledevice
+from argparser import parser_distributed
 
 default_ngrps=1000
-parser = parser_singledevice("Overlapping group lasso, FBF splitting.")
-args = parser.parse_args()
+args = parser_distributed("Overlapping group lasso, FBF splitting.", 1, "../data/ogrp_100_100_10_5000",
+        164.9960**2, default_output_prefix="ogl_fbf_")
 
-ngpu = 1
-nslices = 1
+ngpu = args.ngpus
+nslices = args.nslices
 
 os.environ['CUDA_VISIBLE_DEVICES'] = ','.join([str(i) for i in range(ngpu)]) # select devices
 
@@ -34,8 +34,8 @@ iters = args.iters
 interval = args.interval
 
 import tensorflow as tf
-dat = scipy.io.loadmat('../data/ogrp_100_100_10_5000.mat')
-Xdat = h5py.File('../data/ogrp_100_100_10_5000_X.mat')
+dat = scipy.io.loadmat('{}.mat'.format(args.data_prefix) )
+Xdat = h5py.File('{}_X.mat'.format(args.data_prefix ))
 print ("loading data...")
 At = np.asarray(Xdat['X'])
 print ("done loading data")
@@ -47,11 +47,11 @@ D = dat['C'].tocoo().astype('float32')
 
 lam = ng/100
 loss = dist_pd.losses.QuadLoss
-xnorm = 164.9960 # for 100 grps
 
-dnorm=1.4142; Lf = xnorm**2
+dnorm=1.4142
+Lf = args.L
 kappas = [0]
-expr_names = ['ogl_fbf_001_001']
+expr_names = ['{}001_001'.format(args.output_prefix)]
 params = []
 tau = 2*0.9/Lf
 
@@ -70,6 +70,6 @@ with tf.Session(config=tf.ConfigProto(log_device_placement=False)) as sess:
     print("maxynorm: ", sess.run(penalty.maxynorm)) 
     for param, kappa, expr_name in zip(params, kappas, expr_names):
         alpha1, alpha2, tau = param
-        prob = dist_pd.primal_dual.FBFInertial(loss, penalty, At, D_dist, b, aggregate=False, 
+        prob = dist_pd.primal_dual.FBFInertial(loss, penalty, At, D_dist, b, aggregate=not args.nonergodic, 
             tau=tau, alpha1=alpha1, alpha2=alpha2, dtype=tf.float32, devices=devices)
         rslt = prob.solve(check_interval=interval, max_iters=iters,outfile=expr_name,verbose=True)
