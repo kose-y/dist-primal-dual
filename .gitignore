@@ -4,7 +4,5 @@ build/
 dist/
 dist_pd.egg-info/
 data/*
-docker/
-dockerfiles/
 *.mat
 

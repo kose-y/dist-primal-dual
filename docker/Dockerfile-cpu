@@ -1,0 +1,43 @@
+FROM ubuntu:16.04
+
+ENV CONDA_DIR /opt/conda
+ENV PATH $CONDA_DIR/bin:$PATH
+ENV LANG C.UTF-8
+
+RUN mkdir -p $CONDA_DIR && \
+    echo export PATH=$CONDA_DIR/bin:'$PATH' > /etc/profile.d/conda.sh && \
+    apt-get update && \
+    apt-get install -y wget git libhdf5-dev g++ bzip2 && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-4.5.11-Linux-x86_64.sh && \
+    /bin/bash /Miniconda3-4.5.11-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-4.5.11-Linux-x86_64.sh && \
+    ${CONDA_DIR}/bin/conda clean -tipsy  
+
+
+
+# Python
+ARG python_version=3.5
+RUN conda install -y python=${python_version} && \
+    pip install h5py scipy numpy tensorflow && \
+    conda clean -yt
+
+ENV PYTHONPATH='/src/:$PYTHONPATH'
+
+ENV USER user
+ENV UID 1000
+
+RUN useradd -m -s /bin/bash -N -u $UID $USER && \
+    git clone https://github.com/kose-y/dist-primal-dual && \
+    chown -R user /dist-primal-dual && \
+    mkdir -p $CONDA_DIR && \
+    chown $USER $CONDA_DIR -R 
+
+USER user
+WORKDIR /dist-primal-dual
+RUN python setup.py install && \
+    mkdir -p data && \
+    wget --quiet https://www.dropbox.com/s/d7tpa8insoq844g/ogrp_100_100_10_5000_X.mat -P data/ && \
+    wget --quiet https://www.dropbox.com/s/t14b7p4dq66up9k/ogrp_100_100_10_5000.mat -P data/ && \
+    wget --quiet https://www.dropbox.com/s/jc96pvzq4lo58ot/Zhu_1000_10_5000_20_0.7_100_X.mat -P data/ && \
+    wget --quiet https://www.dropbox.com/s/tl8ode7ny8elole/Zhu_1000_10_5000_20_0.7_100.mat -P data/
+
