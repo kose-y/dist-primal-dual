@@ -20,7 +20,7 @@ For GPU support, you have to install NVIDIA Container Runtime for Docker.
 
 ## Puling docker image
 
-The container image is stored on Docker Hub. One may pull (or "download") this image using the command
+The container images are stored on Docker Hub. One may pull (or "download") these images using the command
 ```
 docker pull kose/dist-primal-dual:cpu
 ```
