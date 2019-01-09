@@ -7,7 +7,7 @@ This repository contains the Python package `dist_pd` for distributed computatio
 
 ### On Linux
 
-Prerequisites: Python 3, with tensorflow >=1.2 installed. The code is tested on Python 3.6.  **Tensorflow is not automatically installed by our setup script**. To install tensorflow on your system, you can follow the instructions in [this link](https://www.tensorflow.org/install/). 
+Prerequisites: Python 3, with tensorflow >=1.2 installed. The code is tested on Python 3.5.  **Tensorflow is not automatically installed by our setup script**. To install tensorflow on your system, you can follow the instructions in [this link](https://www.tensorflow.org/install/). 
 If you wish to run the code on Nvidia GPU(s), please read instructions on additional setup [here](https://www.tensorflow.org/install/gpu).
 
 One may run the following to install the code:
@@ -51,4 +51,4 @@ You may choose to download a bigger dataset from Docker Hub.
 
 If you use our package in your research, please cite the following item:
 
-    Ko S, Yu D, Won J (2018). Easily parallelizable and distributable class of algorithms for structured sparsity, with optimal acceleration. arXiv preprint arXiv:1702.06234 (info on the Journal of Computational and Graphical Statistics?).
+_Ko S, Yu D, Won J (2019). Easily parallelizable and distributable class of algorithms for structured sparsity, with optimal acceleration. Accepted with minor revision for Journal of Computational and Graphical Statistics. [link to preprint](https://arxiv.org/abs/1702.06234)_
