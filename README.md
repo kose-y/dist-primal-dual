@@ -45,7 +45,7 @@ https://www.dropbox.com/s/tl8ode7ny8elole/Zhu_1000_10_5000_20_0.7_100.mat
 
 If you are on linux, you can download the files using the script `download_data.py`. 
 
-You may choose to download a bigger dataset from Docker Hub.
+You may choose to download a bigger dataset from Docker Hub: see `docker/README.md`.
 
 ## Citation
 
