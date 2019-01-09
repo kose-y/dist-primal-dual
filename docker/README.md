@@ -50,8 +50,8 @@ nvidia-docker run -it kose/dist-primal-dual:gpu-big
 ```
 The initial working directory is the root of cloned git repository. After using the command `cd examples`, you can run the example codes there.
 
-## Building the docker image 
-You can also recreate the Docker images for `cpu` and `gpu` from the Dockerfiles in this directory:
+## Building the docker image (optional)
+You can also recreate the Docker images for `cpu` and `gpu` from the Dockerfiles in this directory instead of pulling the docker image:
 
 ```
 docker build -t kose/dist-primal-dual:cpu -f Dockerfile-cpu .
