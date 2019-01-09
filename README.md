@@ -5,6 +5,12 @@ This repository contains the Python package `dist_pd` for distributed computatio
 
 ## Installation
 
+
+### On Docker (recommended)
+
+We have all the prerequisites readily installed in our docker containers. See `docker/`. 
+The docker version contains an option to also download a bigger dataset, which are shown to be scalable on multiple GPU devices.
+
 ### On Linux
 
 Prerequisites: Python 3, with tensorflow >=1.2 installed. The code is tested on Python 3.5.  **Tensorflow is not automatically installed by our setup script**. To install tensorflow on your system, you can follow the instructions in [this link](https://www.tensorflow.org/install/). 
@@ -17,12 +23,6 @@ git clone https://github.com/kose-y/dist_pd.git
 cd dist_pd
 python setup.py install
 ```
-
-### On Docker (recommended)
-
-The docker version contains an option to include bigger dataset, which are shown to be scalable on multiple GPU devices.
-
-
 
 ## Running the examples
 
