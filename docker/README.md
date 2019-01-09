@@ -1,6 +1,6 @@
 # Using the package via Docker
 
-Docker is a tool that helps us creating, deploying, and running applications by using containers. People can package up an application with all of its dependencies as one contianer. 
+Docker is a tool that helps us creating, deploying, and running applications by using containers. People can package up an application with all of its dependencies as one contianer. Our package with all the prerequisites installed is distributed in the form of docker image.
 
 - [What is Docker?](https://opensource.com/resources/what-docker)
 
@@ -48,16 +48,17 @@ or
 ```
 nvidia-docker run -it kose/dist-primal-dual:gpu-big
 ```
+The initial working directory is the root of cloned git repository. After using the command `cd examples`, you can run the example codes there.
 
-## Building docker image 
+## Building the docker image 
 You can also recreate the Docker images for `cpu` and `gpu` from the Dockerfiles in this directory:
 
 ```
-docker build -t kose/dist-primal-dual:cpu Dockerfile-cpu 
+docker build -t kose/dist-primal-dual:cpu -f Dockerfile-cpu .
 ```
 or 
 ```
-docker build -t kose/dist-primal-dual:gpu Dockerfile-gpu 
+docker build -t kose/dist-primal-dual:gpu -f Dockerfile-gpu .
 ```
 
 
