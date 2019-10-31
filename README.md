@@ -56,4 +56,4 @@ If you use our package in your research, please cite the following item:
 
 * [DOI link](https://www.tandfonline.com/doi/full/10.1080/10618600.2019.1592757)
 * [arXiv preprint](https://arxiv.org/abs/1702.06234)
-    * Note: Older version of the manuscript was titled ["On a Class of First-order Primal-Dual Algorithms for Composite Convex Minimization Problems"](https://arxiv.org/abs/1702.06234v1).
+    * Note: [Older version](https://arxiv.org/abs/1702.06234v1) of the manuscript was titled "On a Class of First-order Primal-Dual Algorithms for Composite Convex Minimization Problems".
