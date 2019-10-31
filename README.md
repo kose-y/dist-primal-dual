@@ -54,6 +54,6 @@ If you use our package in your research, please cite the following item:
 
     Ko S, Yu D, Won J (2019+). Easily parallelizable and distributable class of algorithms for structured sparsity, with optimal acceleration. Journal of Computational and Graphical Statistics, in press.
 
-[link to preprint](https://arxiv.org/abs/1702.06234)
-
-[DOI link](https://www.tandfonline.com/doi/full/10.1080/10618600.2019.1592757)
+* [DOI link](https://www.tandfonline.com/doi/full/10.1080/10618600.2019.1592757)
+* [arXiv preprint](https://arxiv.org/abs/1702.06234)
+    * Note: Older version of the manuscript was titled ["On a Class of First-order Primal-Dual Algorithms for Composite Convex Minimization Problems"](https://arxiv.org/abs/1702.06234v1).
