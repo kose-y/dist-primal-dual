@@ -43,7 +43,7 @@ https://www.dropbox.com/s/jc96pvzq4lo58ot/Zhu_1000_10_5000_20_0.7_100_X.mat
 https://www.dropbox.com/s/tl8ode7ny8elole/Zhu_1000_10_5000_20_0.7_100.mat
 ```
 
-If you are using Docker, these datasets comes with the package. 
+If you are using Docker, these datasets come with the package. 
 You may also choose to download a bigger dataset from Docker Hub: see `docker/README.md`.
 
 If you are on linux, you can download the files using the script `download_data.py`. 
