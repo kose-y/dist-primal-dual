@@ -52,7 +52,25 @@ If you are on linux, you can download the files using the script `download_data.
 
 If you use our package in your research, please cite the following item:
 
-    Ko S, Yu D, Won J (2019+). Easily parallelizable and distributable class of algorithms for structured sparsity, with optimal acceleration. Journal of Computational and Graphical Statistics, in press.
+```
+@article{doi:10.1080/10618600.2019.1592757,
+    author = {Seyoon Ko and Donghyeon Yu and Joong-Ho Won},
+    title = {Easily Parallelizable and Distributable Class of Algorithms for Structured Sparsity, with Optimal Acceleration},
+    journal = {Journal of Computational and Graphical Statistics},
+    volume = {28},
+    number = {4},
+    pages = {821-833},
+    year  = {2019},
+    publisher = {Taylor & Francis},
+    doi = {10.1080/10618600.2019.1592757},
+    URL = { 
+        https://doi.org/10.1080/10618600.2019.1592757
+    },
+    eprint = { 
+        https://doi.org/10.1080/10618600.2019.1592757
+    }
+}
+```
 
 * [DOI link](https://www.tandfonline.com/doi/full/10.1080/10618600.2019.1592757)
 * [arXiv preprint](https://arxiv.org/abs/1702.06234)
