@@ -1,6 +1,10 @@
 # dist-primal-dual
 
-This repository contains the Python package `dist_pd` for distributed computation of primal-dual problems in multiple GPUs with optimal acceleration. Based on Tensorflow, we implemented distributed dense and sparse matrices, basic operations on them, and implementations of primal-dual algorithms based on these operations.   
+This repository contains the Python package `dist_pd` for distributed computation of primal-dual problems in multiple GPUs with optimal acceleration, published in
+
+* S. Ko, D. Yu, J. Won. Easily Parallelizable and Distributable Class of Algorithms for Structured Sparsity, With Optimal Acceleration. [J. Comput. Graph. Stat.](https://doi.org/10.1080/10618600.2019.1592757) 2019:28(4), 821- 2833.
+
+Based on Tensorflow, we implemented distributed dense and sparse matrices, basic operations on them, and implementations of primal-dual algorithms based on these operations.   
 
 
 ## Installation
